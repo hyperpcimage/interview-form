@@ -470,13 +470,24 @@ Respond ONLY with valid JSON (no markdown):
     interviewer_rec:get('rec'),
   };
 
+  // 1. Save to Google Sheet (runs silently in background)
+  const SHEET_URL='https://script.google.com/macros/s/AKfycbzjDBzgCqrb2kktJvmioLE0puB7KsnyKoNr05YwICTk61JRfBPewH1DHNhude7eHbY/exec';
+  try{
+    await fetch(SHEET_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(emailParams)
+    });
+  }catch(e){console.warn('Sheet save failed:',e);}
+
+  // 2. Send email via EmailJS
   try{
     await emailjs.send(svc,tpl,emailParams);
-    // Show clean success screen — no scores visible to user
     id('result').style.display='block';
     btn.innerHTML='<i class="ti ti-check"></i> Submitted successfully';
     window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-  } catch(e){
+  }catch(e){
     id('result').style.display='block';
     id('error-box').style.display='flex';
     id('error-text').textContent='Email failed to send. Please check your EmailJS config. Error: '+(e.text||e.message||e);
