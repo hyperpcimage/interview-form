@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Interview Form — PC Image</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh}
+  .page-header{background:#fff;border-bottom:1px solid #e5e5e3;padding:1rem 1.5rem;display:flex;align-items:center;gap:12px}
+  .page-header h1{font-size:18px;font-weight:600;color:#1a1a1a}
+  .page-header p{font-size:13px;color:#666;margin-top:1px}
+  .logo{width:36px;height:36px;background:#534AB7;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;flex-shrink:0}
+  .wrap{max-width:680px;margin:2rem auto;padding:0 1rem 4rem}
+  .section{background:#fff;border:1px solid #e5e5e3;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem}
+  .section-title{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1.1rem;display:flex;align-items:center;gap:6px}
+  .section-title i{font-size:15px}
+  .field{margin-bottom:1.2rem}
+  .field:last-child{margin-bottom:0}
+  label.lbl{display:block;font-size:14px;font-weight:500;color:#1a1a1a;margin-bottom:.4rem}
+  .req{color:#E24B4A;margin-left:2px}
+  input[type=text],input[type=number],input[type=email],textarea,select{
+    width:100%;font-size:14px;padding:9px 12px;
+    border:1px solid #e0e0e0;border-radius:8px;
+    background:#fff;color:#1a1a1a;font-family:inherit;
+    transition:border-color .15s}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:#534AB7;box-shadow:0 0 0 3px rgba(83,74,183,.1)}
+  textarea{resize:vertical;min-height:76px}
+  .radio-group,.check-group{display:flex;flex-direction:column;gap:6px;margin-top:.3rem}
+  .radio-item{display:flex;align-items:center;gap:10px;font-size:14px;color:#1a1a1a;cursor:pointer;
+    padding:9px 12px;border:1px solid #e5e5e3;border-radius:8px;transition:all .12s;user-select:none}
+  .radio-item:hover{background:#f9f9f7;border-color:#ccc}
+  .radio-item.sel{background:#EEEDFE;border-color:#AFA9EC}
+  .radio-item input[type=radio]{width:15px;height:15px;accent-color:#534AB7;cursor:pointer;flex-shrink:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:.3rem}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .no-pts{font-size:11px;color:#888;background:#f0f0ee;padding:2px 8px;border-radius:20px;margin-left:auto;font-weight:500}
+  .checklist-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;
+    border:1px solid #e5e5e3;border-radius:8px;font-size:14px;cursor:pointer;transition:all .12s}
+  .checklist-item:hover{background:#f9f9f7}
+  .checklist-item.done{background:#EAF3DE;border-color:#97C459}
+  .checklist-item input{accent-color:#3B6D11;width:15px;height:15px;flex-shrink:0;margin-top:2px;cursor:pointer}
+  .divider{border:none;border-top:1px solid #f0f0ee;margin:1rem 0}
+  .submit-btn{width:100%;padding:13px;background:#534AB7;color:#fff;border:none;border-radius:10px;
+    font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s;
+    display:flex;align-items:center;justify-content:center;gap:8px}
+  .submit-btn:hover{opacity:.9}
+  .submit-btn:disabled{opacity:.5;cursor:not-allowed}
+
+  /* Success screen — shown after submit */
+  #result{display:none;background:#fff;border:1px solid #e5e5e3;border-radius:12px;padding:2rem 1.5rem;margin-top:1rem;text-align:center}
+  .success-icon{width:56px;height:56px;background:#EAF3DE;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:26px}
+  .success-title{font-size:18px;font-weight:600;color:#1a1a1a;margin-bottom:.5rem}
+  .success-sub{font-size:14px;color:#666;line-height:1.6;margin-bottom:1.25rem}
+  .email-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .email-chip{background:#f0f0ee;border-radius:20px;padding:5px 14px;font-size:13px;color:#444;display:flex;align-items:center;gap:6px}
+  .email-chip i{font-size:14px;color:#534AB7}
+  .error-box{background:#FCEBEB;border:1px solid #F09595;border-radius:8px;padding:.75rem 1rem;
+    font-size:13px;color:#A32D2D;display:flex;align-items:center;gap:8px;margin-top:1rem;text-align:left}
+  .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;
+    border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* SETUP OVERLAY */
+  #setup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;
+    display:flex;align-items:center;justify-content:center;padding:1rem}
+  #setup-box{background:#fff;border-radius:16px;padding:2rem;max-width:480px;width:100%;max-height:90vh;overflow-y:auto}
+  #setup-box h2{font-size:18px;font-weight:600;margin-bottom:.5rem}
+  #setup-box p{font-size:14px;color:#666;line-height:1.6;margin-bottom:1.25rem}
+  .setup-field{margin-bottom:1rem}
+  .setup-field label{display:block;font-size:13px;font-weight:500;margin-bottom:.3rem}
+  .setup-field input{width:100%;font-size:14px;padding:9px 12px;border:1px solid #e0e0e0;border-radius:8px;font-family:inherit}
+  .setup-btn{width:100%;padding:11px;background:#534AB7;color:#fff;border:none;border-radius:8px;
+    font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:.5rem}
+  .setup-btn:hover{opacity:.9}
+  .step-tag{display:inline-block;background:#EEEDFE;color:#3C3489;font-size:11px;font-weight:600;
+    padding:2px 8px;border-radius:20px;margin-right:6px}
+  .step-list{list-style:none;padding:0;margin-bottom:1.25rem}
+  .step-list li{font-size:13px;color:#444;line-height:1.7;padding:3px 0}
+  a.link{color:#534AB7;text-decoration:underline}
+</style>
+</head>
+<body>
+
+<!-- SETUP OVERLAY -->
+<div id="setup-overlay">
+  <div id="setup-box">
+    <h2>⚙️ One-time setup</h2>
+    <p>To send form results by email, this form uses <strong>EmailJS</strong> (free) and the <strong>Anthropic API</strong> for AI analysis. You only need to enter these once — they'll be saved in your browser.</p>
+    <ol class="step-list">
+      <li><span class="step-tag">Step A</span> Go to <a class="link" href="https://emailjs.com" target="_blank">emailjs.com</a> → sign up free → connect your Gmail</li>
+      <li><span class="step-tag">Step B</span> Create a service (Gmail) → note your <strong>Service ID</strong></li>
+      <li><span class="step-tag">Step C</span> Create an Email Template → note the <strong>Template ID</strong></li>
+      <li><span class="step-tag">Step D</span> Go to Account → API Keys → copy your <strong>Public Key</strong></li>
+      <li><span class="step-tag">Step E</span> Get your Anthropic API key from <a class="link" href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></li>
+    </ol>
+    <div class="setup-field">
+      <label>EmailJS Public Key</label>
+      <input type="text" id="cfg-ejs-key" placeholder="e.g. xK2pXxxxxxxxxxxxxxx">
+    </div>
+    <div class="setup-field">
+      <label>EmailJS Service ID</label>
+      <input type="text" id="cfg-ejs-svc" placeholder="e.g. service_xxxxxxx">
+    </div>
+    <div class="setup-field">
+      <label>EmailJS Template ID</label>
+      <input type="text" id="cfg-ejs-tpl" placeholder="e.g. template_xxxxxxx">
+    </div>
+    <div class="setup-field">
+      <label>Anthropic API Key</label>
+      <input type="text" id="cfg-api-key" placeholder="sk-ant-...">
+    </div>
+    <button class="setup-btn" onclick="saveConfig()">Save & open form</button>
+    <p style="font-size:12px;color:#999;margin-top:.75rem;text-align:center">Keys are saved only in your browser. Never shared.</p>
+  </div>
+</div>
+
+<div class="page-header">
+  <div class="logo">PC</div>
+  <div>
+    <h1>Staff Interview Form</h1>
+    <p>PC Image — For interviewer use only</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- SECTION 1: Interview Details -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-id-badge"></i> Interview details</div>
+    <div class="field">
+      <label class="lbl">Interviewer <span class="req">*</span></label>
+      <div class="radio-group" id="grp-interviewer">
+        <label class="radio-item"><input type="radio" name="interviewer" value="Sheng"> Sheng</label>
+        <label class="radio-item"><input type="radio" name="interviewer" value="Wan"> Wan</label>
+        <label class="radio-item"><input type="radio" name="interviewer" value="Gavin"> Gavin</label>
+        <label class="radio-item" id="ri-other">
+          <input type="radio" name="interviewer" value="__other__">
+          <input type="text" id="interviewer-other" placeholder="Other — type name"
+            style="border:none;padding:0;background:transparent;font-size:14px;flex:1;outline:none"
+            onclick="document.querySelector('input[name=interviewer][value=__other__]').checked=true;syncRadio('interviewer')">
+        </label>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Interviewee name <span class="req">*</span></label>
+      <input type="text" id="interviewee" placeholder="Full name">
+    </div>
+    <div class="field">
+      <label class="lbl">Position applied for <span class="req">*</span></label>
+      <div class="grid2">
+        <label class="radio-item"><input type="radio" name="position" value="Supervisor"> Supervisor</label>
+        <label class="radio-item"><input type="radio" name="position" value="Sales"> Sales</label>
+        <label class="radio-item"><input type="radio" name="position" value="Admin"> Admin</label>
+        <label class="radio-item"><input type="radio" name="position" value="Cashier"> Cashier</label>
+        <label class="radio-item"><input type="radio" name="position" value="Logistic"> Logistic</label>
+        <label class="radio-item"><input type="radio" name="position" value="Online"> Online</label>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Salary offered (RM)</label>
+      <input type="number" id="salary" placeholder="e.g. 2000">
+    </div>
+  </div>
+
+  <!-- SECTION 2: Attire -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-shirt"></i> First impression — attire</div>
+    <div class="field">
+      <label class="lbl">How is the candidate's appearance? <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="attire" value="5"> Very neat — proper hair, shirt &amp; long pants</label>
+        <label class="radio-item"><input type="radio" name="attire" value="3"> Acceptable — mostly neat with minor issues</label>
+        <label class="radio-item"><input type="radio" name="attire" value="0"> Messy — shorts or inappropriate attire</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Personal Background -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-user"></i> Ice breaking — personal background <span class="no-pts">Not scored</span></div>
+    <div class="grid3" style="margin-bottom:1rem;gap:8px">
+      <div class="field" style="margin:0">
+        <label class="lbl">Marital status</label>
+        <select id="marital"><option value="">Select...</option><option>Single</option><option>Married</option><option>In a relationship</option></select>
+      </div>
+      <div class="field" style="margin:0">
+        <label class="lbl">No. of children</label>
+        <input type="number" id="children" placeholder="0" min="0">
+      </div>
+      <div class="field" style="margin:0">
+        <label class="lbl">Staying with parents?</label>
+        <select id="parents"><option value="">Select...</option><option>Yes</option><option>No</option></select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Previous work experience <span class="req">*</span></label>
+      <textarea id="experience" placeholder="Describe previous job roles, tasks, or specialties..."></textarea>
+    </div>
+    <div class="field">
+      <label class="lbl">Reason for leaving previous job <span class="req">*</span></label>
+      <textarea id="reason" placeholder="Brief explanation..."></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 4: Scored Assessment (no badges shown) -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-clipboard-check"></i> Assessment</div>
+
+    <div class="field">
+      <label class="lbl">Can create short video content? <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="video" value="5"> Yes, experienced with short video content</label>
+        <label class="radio-item"><input type="radio" name="video" value="2"> No but willing and able to learn</label>
+        <label class="radio-item"><input type="radio" name="video" value="0"> No and not interested in learning</label>
+      </div>
+    </div>
+    <hr class="divider">
+
+    <div class="field">
+      <label class="lbl">Job stability — how often did they change jobs? <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="stability" value="5"> Stable — changed every 3–5 years</label>
+        <label class="radio-item"><input type="radio" name="stability" value="3"> Moderate — changed roughly every 2 years</label>
+        <label class="radio-item"><input type="radio" name="stability" value="1"> Frequent — changed every few months to a year</label>
+      </div>
+    </div>
+    <hr class="divider">
+
+    <div class="field">
+      <label class="lbl">Transport / Commute <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="transport" value="5"> Own car or motorcycle</label>
+        <label class="radio-item"><input type="radio" name="transport" value="3"> Uses public transport (MRT/bus)</label>
+        <label class="radio-item"><input type="radio" name="transport" value="1"> No transport arrangement</label>
+      </div>
+    </div>
+    <hr class="divider">
+
+    <div class="field">
+      <label class="lbl">Willing to support another branch temporarily? <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="branch" value="5"> Yes, open to branch transfers</label>
+        <label class="radio-item"><input type="radio" name="branch" value="0"> No</label>
+      </div>
+    </div>
+    <hr class="divider">
+
+    <div class="field">
+      <label class="lbl">Willing to participate in roadshows or events? (up to 1 week) <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="roadshow" value="5"> Yes</label>
+        <label class="radio-item"><input type="radio" name="roadshow" value="0"> No</label>
+      </div>
+    </div>
+    <hr class="divider">
+
+    <div class="field">
+      <label class="lbl">Medical leave / sick day frequency <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="health" value="5"> Rarely — never or less than once a year</label>
+        <label class="radio-item"><input type="radio" name="health" value="4"> Occasionally — about once a year</label>
+        <label class="radio-item"><input type="radio" name="health" value="3"> Sometimes — once a month</label>
+        <label class="radio-item"><input type="radio" name="health" value="0"> Frequently — weekly</label>
+      </div>
+    </div>
+    <hr class="divider">
+
+    <div class="field">
+      <label class="lbl">Attitude &amp; overall impression <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="attitude" value="5"> Excellent — proactive, positive, confident</label>
+        <label class="radio-item"><input type="radio" name="attitude" value="4"> Good — pleasant and cooperative</label>
+        <label class="radio-item"><input type="radio" name="attitude" value="3"> Average — neutral response</label>
+        <label class="radio-item"><input type="radio" name="attitude" value="0"> Poor — negative or uncooperative</label>
+      </div>
+    </div>
+    <hr class="divider">
+
+    <div class="field">
+      <label class="lbl">Acceptance of sales targets &amp; task pressure <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="target" value="5"> Yes — embraces targets and pressure</label>
+        <label class="radio-item"><input type="radio" name="target" value="3"> Okay — can manage with some support</label>
+        <label class="radio-item"><input type="radio" name="target" value="0"> No — not comfortable with pressure</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: Onboarding Checklist -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-checklist"></i> Onboarding checklist <span class="no-pts">Tick when done</span></div>
+    <div class="check-group">
+      <label class="checklist-item" id="ci-culture"><input type="checkbox" onchange="toggleCheck(this,'ci-culture')"> Introduced company culture &amp; 6 Endeavours</label>
+      <label class="checklist-item" id="ci-trial"><input type="checkbox" onchange="toggleCheck(this,'ci-trial')"> Informed of 7-day trial period before confirmation</label>
+      <label class="checklist-item" id="ci-bank"><input type="checkbox" onchange="toggleCheck(this,'ci-bank')"> Informed that Public Bank account is required</label>
+      <label class="checklist-item" id="ci-salary"><input type="checkbox" onchange="toggleCheck(this,'ci-salary')"> Explained salary scheme (working day count, OT cycle 24th–23rd; commission &amp; leave cycle 1st–31st previous month)</label>
+      <label class="checklist-item" id="ci-leave"><input type="checkbox" onchange="toggleCheck(this,'ci-leave')"> Explained leave application process (apply in advance, inform before leave)</label>
+      <label class="checklist-item" id="ci-ic"><input type="checkbox" onchange="toggleCheck(this,'ci-ic')"> Collected photocopy of IC</label>
+    </div>
+  </div>
+
+  <!-- SECTION 6: Recommendation -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-star"></i> Interviewer's recommendation <span class="req">*</span></div>
+    <div class="radio-group">
+      <label class="radio-item"><input type="radio" name="rec" value="Highly Recommended"> Highly Recommended</label>
+      <label class="radio-item"><input type="radio" name="rec" value="Recommended"> Recommended</label>
+      <label class="radio-item"><input type="radio" name="rec" value="So-So"> So-So — needs further consideration</label>
+      <label class="radio-item"><input type="radio" name="rec" value="Reject"> Reject</label>
+    </div>
+    <div class="field" style="margin-top:1rem">
+      <label class="lbl">Additional notes (optional)</label>
+      <textarea id="notes" placeholder="Any other observations about the candidate..."></textarea>
+    </div>
+  </div>
+
+  <button class="submit-btn" id="submit-btn" onclick="submitForm()">
+    <i class="ti ti-send"></i> Submit &amp; send report
+  </button>
+
+  <!-- SUCCESS / ERROR RESULT -->
+  <div id="result">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Form submitted successfully!</div>
+    <div class="success-sub">The interview report has been generated by AI and sent to the team.</div>
+    <div class="email-chips">
+      <div class="email-chip"><i class="ti ti-mail"></i> eileen@pcimage.com.my</div>
+      <div class="email-chip"><i class="ti ti-mail"></i> tat@pcimage.com.my</div>
+    </div>
+    <div id="error-box" class="error-box" style="display:none">
+      <i class="ti ti-alert-circle" style="font-size:18px;flex-shrink:0"></i>
+      <span id="error-text"></span>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+const TO_EMAIL = 'eileen@pcimage.com.my';
+const CC_EMAIL = 'tat@pcimage.com.my';
+
+function saveConfig(){
+  const k=id('cfg-ejs-key').value.trim(), s=id('cfg-ejs-svc').value.trim(),
+        t=id('cfg-ejs-tpl').value.trim(), a=id('cfg-api-key').value.trim();
+  if(!k||!s||!t||!a){ alert('Please fill in all four fields.'); return; }
+  localStorage.setItem('ejs_key',k); localStorage.setItem('ejs_svc',s);
+  localStorage.setItem('ejs_tpl',t); localStorage.setItem('ant_key',a);
+  id('setup-overlay').style.display='none';
+  emailjs.init(k);
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const k=localStorage.getItem('ejs_key');
+  if(k){ id('setup-overlay').style.display='none'; emailjs.init(k); }
+});
+
+function id(x){ return document.getElementById(x); }
+function val(x){ return (id(x)||{}).value?.trim()||''; }
+function get(name){ return document.querySelector(`input[name=${name}]:checked`)?.value||''; }
+function toggleCheck(cb,elId){ id(elId).classList.toggle('done',cb.checked); }
+
+document.querySelectorAll('.radio-item input[type=radio]').forEach(r=>{
+  r.addEventListener('change',()=>{
+    document.querySelectorAll(`input[name=${r.name}]`).forEach(x=>x.closest('.radio-item').classList.toggle('sel',x.checked));
+  });
+});
+
+const SCORED=['attire','video','stability','transport','branch','roadshow','health','attitude','target'];
+function calcScore(){
+  let t=0;
+  SCORED.forEach(f=>{ const el=document.querySelector(`input[name=${f}]:checked`); if(el) t+=+el.value; });
+  return t;
+}
+
+function checklistText(){
+  return [
+    ['ci-culture','Company culture & 6 Endeavours introduced'],
+    ['ci-trial',  '7-day trial period informed'],
+    ['ci-bank',   'Public Bank account requirement informed'],
+    ['ci-salary', 'Salary scheme explained'],
+    ['ci-leave',  'Leave application process explained'],
+    ['ci-ic',     'IC photocopy collected'],
+  ].map(([cid,label])=>(id(cid).querySelector('input').checked?'✅':'☐')+' '+label).join('\n');
+}
+
+async function submitForm(){
+  const missing=[];
+  if(!val('interviewee')) missing.push('Interviewee name');
+  if(!get('interviewer')) missing.push('Interviewer');
+  if(!get('position'))    missing.push('Position');
+  if(!val('experience'))  missing.push('Work experience');
+  if(!val('reason'))      missing.push('Reason for leaving');
+  SCORED.forEach(f=>{ if(!get(f)) missing.push(f); });
+  if(!get('rec'))         missing.push('Recommendation');
+  if(missing.length){ alert('Please complete:\n• '+missing.join('\n• ')); return; }
+
+  const score=calcScore();
+  const pct=Math.round((score/40)*100); // convert to 100%
+  const btn=id('submit-btn');
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner"></div> Analysing & sending…';
+
+  const interviewer=get('interviewer')==='__other__'?val('interviewer-other'):get('interviewer');
+
+  // AI Analysis
+  const prompt=`You are a senior HR manager. Analyse this staff interview and return a hiring evaluation.
+
+Candidate: ${val('interviewee')}
+Position: ${get('position')}
+Interviewer: ${interviewer}
+Salary offered: RM ${val('salary')||'Not stated'}
+
+SCORES (converted to 100%: ${pct}%):
+- Attire/Appearance: ${get('attire')}/5
+- Video content skill: ${get('video')}/5
+- Job stability: ${get('stability')}/5
+- Transport: ${get('transport')}/5
+- Branch flexibility: ${get('branch')}/5
+- Roadshow willingness: ${get('roadshow')}/5
+- Sick leave frequency: ${get('health')}/5
+- Attitude: ${get('attitude')}/5
+- Target/pressure acceptance: ${get('target')}/5
+Raw total: ${score}/40 = ${pct}%
+
+Background:
+- Marital: ${val('marital')||'N/A'}, Children: ${val('children')||'0'}, With parents: ${val('parents')||'N/A'}
+- Experience: ${val('experience')}
+- Reason for leaving: ${val('reason')}
+Interviewer recommendation: ${get('rec')}
+Notes: ${val('notes')||'None'}
+
+Respond ONLY with valid JSON (no markdown):
+{"verdict":"<Highly Recommended|Recommended|Consider|Reject>","summary":"<3 sentence summary>","strengths":"<2-3 strengths>","concerns":"<1-2 concerns>","recommendation":"<next steps>"}`;
+
+  let parsed={verdict:get('rec'),summary:'',strengths:'',concerns:'',recommendation:''};
+  try{
+    const antKey=localStorage.getItem('ant_key')||'';
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'content-type':'application/json','x-api-key':antKey,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:900,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    parsed=JSON.parse((data.content?.[0]?.text||'{}').replace(/```json|```/g,'').trim());
+  } catch(e){}
+
+  // Send email — score shown as % only
+  const svc=localStorage.getItem('ejs_svc')||'';
+  const tpl=localStorage.getItem('ejs_tpl')||'';
+  const emailParams={
+    to_email:TO_EMAIL, cc_email:CC_EMAIL,
+    interviewee:val('interviewee'), position:get('position'),
+    interviewer:interviewer, salary:val('salary')||'Not stated',
+    total_score:pct+'%',        // shown as % in email
+    percentage:pct+'%',
+    verdict:parsed.verdict||get('rec'),
+    summary:parsed.summary||'', strengths:parsed.strengths||'',
+    concerns:parsed.concerns||'', recommendation:parsed.recommendation||'',
+    checklist:checklistText(), notes:val('notes')||'None',
+    attire:get('attire')+'/5', video:get('video')+'/5',
+    stability:get('stability')+'/5', transport:get('transport')+'/5',
+    branch:get('branch')+'/5', roadshow:get('roadshow')+'/5',
+    health:get('health')+'/5', attitude:get('attitude')+'/5',
+    target:get('target')+'/5', experience:val('experience'),
+    reason:val('reason'), marital:val('marital')||'N/A',
+    children:val('children')||'0', parents:val('parents')||'N/A',
+    interviewer_rec:get('rec'),
+  };
+
+  try{
+    await emailjs.send(svc,tpl,emailParams);
+    // Show clean success screen — no scores visible to user
+    id('result').style.display='block';
+    btn.innerHTML='<i class="ti ti-check"></i> Submitted successfully';
+    window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+  } catch(e){
+    id('result').style.display='block';
+    id('error-box').style.display='flex';
+    id('error-text').textContent='Email failed to send. Please check your EmailJS config. Error: '+(e.text||e.message||e);
+    btn.disabled=false;
+    btn.innerHTML='<i class="ti ti-send"></i> Retry submission';
+  }
+}
+</script>
+</body>
+</html>
