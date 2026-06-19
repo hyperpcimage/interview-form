@@ -288,6 +288,9 @@
       <i class="ti ti-alert-circle" style="font-size:18px;flex-shrink:0"></i>
       <span id="error-text"></span>
     </div>
+    <button class="submit-btn" style="margin-top:1.5rem;background:#1a1a1a" onclick="location.reload()">
+      <i class="ti ti-rotate-clockwise"></i> Fill in another candidate
+    </button>
   </div>
 
 </div>
@@ -301,7 +304,7 @@ const CC_EMAIL = 'tat@pcimage.com.my';
 const EJS_PUBLIC_KEY = 'PL3VpIWcpqCFiCjCp';
 const EJS_SERVICE_ID  = 'service_8wtwsnu';
 const EJS_TEMPLATE_ID = 'template_wygyx49';
-const GEMINI_API_KEY  = 'AQ.Ab8RN6LGqJra3dWmhc5ha_a-t97StHsVZWTlP7xSz9RjyvbXhw';
+const GROQ_API_KEY = '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';
 
 window.addEventListener('DOMContentLoaded', ()=>{
   emailjs.init(EJS_PUBLIC_KEY);
@@ -398,16 +401,20 @@ Respond ONLY with valid JSON (no markdown, no backticks, no explanation before o
 
   let parsed={verdict:ruleVerdict,summary:'AI analysis unavailable — please review answers manually.',strengths:'',concerns:'',recommendation:''};
   try{
-    const gemKey=GEMINI_API_KEY;
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${gemKey}`,{
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
-      headers:{'content-type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+      headers:{'content-type':'application/json','Authorization':'Bearer '+GROQ_API_KEY},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        messages:[{role:'user',content:prompt}],
+        temperature:0.3
+      })
     });
     const data=await res.json();
-    const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'{}';
+    if(!res.ok){ console.error('Groq API error:', res.status, data); }
+    const text=data.choices?.[0]?.message?.content||'{}';
     parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
-  } catch(e){}
+  } catch(e){ console.error('Groq call failed:', e); }
 
   // Send email — score shown as % only
   const svc=EJS_SERVICE_ID;
