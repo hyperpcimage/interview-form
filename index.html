@@ -8,7 +8,7 @@
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh}
-  .page-header{background:#fff;border-bottom:1px solid #e5e5e3;padding:1rem 1.5rem;display:flex;align-items:center;gap:12px}
+  .page-header{background:#fff;border-bottom:1pxQ solid #e5e5e3;padding:1rem 1.5rem;display:flex;align-items:center;gap:12px}
   .page-header h1{font-size:18px;font-weight:600;color:#1a1a1a}
   .page-header p{font-size:13px;color:#666;margin-top:1px}
   .logo{width:36px;height:36px;background:#534AB7;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;flex-shrink:0}
@@ -87,13 +87,13 @@
 <div id="setup-overlay">
   <div id="setup-box">
     <h2>⚙️ One-time setup</h2>
-    <p>To send form results by email, this form uses <strong>EmailJS</strong> (free) and the <strong>Anthropic API</strong> for AI analysis. You only need to enter these once — they'll be saved in your browser.</p>
+    <p>To send form results by email, this form uses <strong>EmailJS</strong> (free) and <strong>Google Gemini</strong> (free) for AI analysis. You only need to enter these once — they'll be saved in your browser.</p>
     <ol class="step-list">
       <li><span class="step-tag">Step A</span> Go to <a class="link" href="https://emailjs.com" target="_blank">emailjs.com</a> → sign up free → connect your Gmail</li>
       <li><span class="step-tag">Step B</span> Create a service (Gmail) → note your <strong>Service ID</strong></li>
       <li><span class="step-tag">Step C</span> Create an Email Template → note the <strong>Template ID</strong></li>
       <li><span class="step-tag">Step D</span> Go to Account → API Keys → copy your <strong>Public Key</strong></li>
-      <li><span class="step-tag">Step E</span> Get your Anthropic API key from <a class="link" href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></li>
+      <li><span class="step-tag">Step E</span> Get your free Gemini API key from <a class="link" href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a></li>
     </ol>
     <div class="setup-field">
       <label>EmailJS Public Key</label>
@@ -108,8 +108,8 @@
       <input type="text" id="cfg-ejs-tpl" placeholder="e.g. template_xxxxxxx">
     </div>
     <div class="setup-field">
-      <label>Anthropic API Key</label>
-      <input type="text" id="cfg-api-key" placeholder="sk-ant-...">
+      <label>Gemini API Key</label>
+      <input type="text" id="cfg-api-key" placeholder="AIza...">
     </div>
     <button class="setup-btn" onclick="saveConfig()">Save & open form</button>
     <p style="font-size:12px;color:#999;margin-top:.75rem;text-align:center">Keys are saved only in your browser. Never shared.</p>
@@ -347,7 +347,7 @@ function saveConfig(){
         t=id('cfg-ejs-tpl').value.trim(), a=id('cfg-api-key').value.trim();
   if(!k||!s||!t||!a){ alert('Please fill in all four fields.'); return; }
   localStorage.setItem('ejs_key',k); localStorage.setItem('ejs_svc',s);
-  localStorage.setItem('ejs_tpl',t); localStorage.setItem('ant_key',a);
+  localStorage.setItem('ejs_tpl',t); localStorage.setItem('gem_key',a);
   id('setup-overlay').style.display='none';
   emailjs.init(k);
 }
@@ -398,7 +398,16 @@ async function submitForm(){
   if(missing.length){ alert('Please complete:\n• '+missing.join('\n• ')); return; }
 
   const score=calcScore();
-  const pct=Math.round((score/40)*100); // convert to 100%
+  const MAX_SCORE=45; // 9 questions x 5 pts max each
+  const pct=Math.round((score/MAX_SCORE)*100); // convert to 0-100%
+
+  // Rule-based verdict (always consistent, independent of AI)
+  let ruleVerdict;
+  if(pct===100) ruleVerdict='Highly Recommended';
+  else if(pct>=70) ruleVerdict='Recommended';
+  else if(pct>=50) ruleVerdict='Consider';
+  else ruleVerdict='Reject';
+
   const btn=id('submit-btn');
   btn.disabled=true;
   btn.innerHTML='<div class="spinner"></div> Analysing & sending…';
@@ -413,7 +422,7 @@ Position: ${get('position')}
 Interviewer: ${interviewer}
 Salary offered: RM ${val('salary')||'Not stated'}
 
-SCORES (converted to 100%: ${pct}%):
+SCORES (total: ${pct}% out of 100%):
 - Attire/Appearance: ${get('attire')}/5
 - Video content skill: ${get('video')}/5
 - Job stability: ${get('stability')}/5
@@ -423,7 +432,9 @@ SCORES (converted to 100%: ${pct}%):
 - Sick leave frequency: ${get('health')}/5
 - Attitude: ${get('attitude')}/5
 - Target/pressure acceptance: ${get('target')}/5
-Raw total: ${score}/40 = ${pct}%
+Raw total: ${score}/${MAX_SCORE} = ${pct}%
+
+The verdict has ALREADY been determined by score band: ${ruleVerdict}. Use this exact verdict in your response — do not change it.
 
 Background:
 - Marital: ${val('marital')||'N/A'}, Children: ${val('children')||'0'}, With parents: ${val('parents')||'N/A'}
@@ -432,19 +443,20 @@ Background:
 Interviewer recommendation: ${get('rec')}
 Notes: ${val('notes')||'None'}
 
-Respond ONLY with valid JSON (no markdown):
-{"verdict":"<Highly Recommended|Recommended|Consider|Reject>","summary":"<3 sentence summary>","strengths":"<2-3 strengths>","concerns":"<1-2 concerns>","recommendation":"<next steps>"}`;
+Respond ONLY with valid JSON (no markdown, no backticks, no explanation before or after):
+{"verdict":"${ruleVerdict}","summary":"<3 sentence summary of the candidate>","strengths":"<2-3 sentence paragraph on strengths>","concerns":"<1-2 sentence paragraph on concerns or red flags>","recommendation":"<concrete next steps for hiring>"}`;
 
-  let parsed={verdict:get('rec'),summary:'',strengths:'',concerns:'',recommendation:''};
+  let parsed={verdict:ruleVerdict,summary:'AI analysis unavailable — please review answers manually.',strengths:'',concerns:'',recommendation:''};
   try{
-    const antKey=localStorage.getItem('ant_key')||'';
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const gemKey=localStorage.getItem('gem_key')||'';
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${gemKey}`,{
       method:'POST',
-      headers:{'content-type':'application/json','x-api-key':antKey,'anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:900,messages:[{role:'user',content:prompt}]})
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
     });
     const data=await res.json();
-    parsed=JSON.parse((data.content?.[0]?.text||'{}').replace(/```json|```/g,'').trim());
+    const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'{}';
+    parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
   } catch(e){}
 
   // Send email — score shown as % only
@@ -456,7 +468,7 @@ Respond ONLY with valid JSON (no markdown):
     interviewer:interviewer, salary:val('salary')||'Not stated',
     total_score:pct+'%',        // shown as % in email
     percentage:pct+'%',
-    verdict:parsed.verdict||get('rec'),
+    verdict:parsed.verdict||ruleVerdict,
     summary:parsed.summary||'', strengths:parsed.strengths||'',
     concerns:parsed.concerns||'', recommendation:parsed.recommendation||'',
     checklist:checklistText(), notes:val('notes')||'None',
